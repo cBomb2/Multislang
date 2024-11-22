@@ -8,12 +8,20 @@
     lesson button{
     	border-radius: 100%;
         height: 60px;
+        width: 60px;
         color: #ffffff;
         background-color: #02b103;
         border-color: #039e03;
     }
+    unit {
+    	font-size: 30px;
+    }
 </style>
-<h1 style="">Hello World!</h1>
+<h1 style="">Multislang</h1>
+<unit>Unit 1</unit>
+<br>
+<catagory>simple words</catagory>
+<br>
 <lesson data-session="1" data-unit="1" class="lesson">lesson</lesson>
 <lesson data-session="2" data-unit="1" class="lesson">lesson</lesson>
 <p id="2"></p>
@@ -24,7 +32,7 @@
         button.addEventListener("click", function() {
   		  window.location.href = "/Multislang/lesson.html?lesson=" + x.dataset.session + "&unit=" + x.dataset.unit; 
 		});
-        button.textContent ="button" + x.dataset.session;
+        button.innerHTML = `<img src="file:///C:/Users/Calvin/Downloads/output-onlinepngtools.png" alt="star">`;
         x.textContent="";
 		x.appendChild(button);
     }
