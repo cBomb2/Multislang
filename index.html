@@ -22,7 +22,7 @@
     for (let x of lessons){
     	var button = document.createElement("button");
         button.addEventListener("click", function() {
-  		  window.location.href = "/Multislang/lesson.html/?lesson=" + x.dataset.session + "&unit=" + x.dataset.unit; 
+  		  window.location.href = "/Multislang/lesson.html?lesson=" + x.dataset.session + "&unit=" + x.dataset.unit; 
 		});
         button.textContent ="button" + x.dataset.session;
         x.textContent="";
