@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1 - Xonian</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styling inspired by Duolingo */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            background-color: #58cc02;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+        }
+
+        h1, h2, p {
+            margin: 10px 0;
+        }
+
+        main {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #ddd;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #58cc02;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #58cc02;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        button:hover {
+            background-color: #46a302;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Lesson 1: Greetings</h1>
+    </header>
+    <main>
+        <div id="lesson-container"></div>
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <button id="next-question">Next</button>
+    </main>
+    <footer>
+        <p>&copy; 2024 Xonian Language Learning</p>
+    </footer>
+
+    <script>
+        // Letter-to-Xonian mapping
+        const letterMapping = {
+            "a": "u", "b": "g", "c": "y", "d": "x", "e": "i",
+            "f": "m", "g": "r", "h": "t", "i": "o", "j": "s",
+            "k": "v", "l": "f", "m": "p", "n": "n", "o": "e",
+            "p": "w", "q": "l", "r": "k", "s": "j", "t": "h",
+            "u": "a", "v": "z", "w": "q", "x": "d", "y": "c",
+            "z": "b"
+        };
+
+        // Translate an English word or sentence into Xonian, applying grammar rules
+        function translateWordOrSentence(input) {
+            return input
+                .toLowerCase()
+                .split("")
+                .map(char => {
+                    if (/[a-z]/.test(char)) {
+                        return letterMapping[char] || char;
+                    }
+                    return char; // Preserve spaces and punctuation
+                })
+                .join("")
+                .replace(/([bcdfghjklmnpqrstvwxyz])\1/g, match => match[0] + "í" + match[0]) // cc → c(í)c
+                .replace(/([aeiou])\1/g, match => match[0] + "ñ" + match[0]); // vv → v(ñ)v
+        }
+
+        // Normalize input to ignore accents, punctuation, and capitalization
+        function normalizeInput(input) {
+            return input
+                .toLowerCase()
+                .replace(/í/g, "i")
+                .replace(/ñ/g, "n")
+                .replace(/[^a-z0-9\s]/g, ""); // Remove punctuation
+        }
+
+        // English words for the lesson
+        const englishWords = ["hello", "book", "cool", "moon"];
+        const vocabulary = englishWords.map(word => ({
+            type: "learn",
+            english: word,
+            xonian: translateWordOrSentence(word)
+        }));
+
+        // Track learned words to dynamically create sentences
+        let learnedWords = [];
+
+        const questions = [];
+        const lessonContainer = document.getElementById("lesson-container");
+        const progressBar = document.getElementById("progress-bar");
+        const nextQuestionButton = document.getElementById("next-question");
+
+        let currentQuestion = 0;
+
+        // Generate sentence questions using learned words
+        function generateSentenceQuestions() {
+            const sentences = [];
+            const sentenceStructure = [
+                ["hello", "moon"],
+                ["book", "cool"],
+                ["moon", "book"]
+            ];
+
+            sentenceStructure.forEach(structure => {
+                if (structure.every(word => learnedWords.includes(word))) {
+                    const englishSentence = structure.join(" ");
+                    const xonianSentence = translateWordOrSentence(englishSentence);
+                    sentences.push({
+                        type: "sentence",
+                        english: englishSentence,
+                        xonian: xonianSentence
+                    });
+                }
+            });
+
+            return sentences;
+        }
+
+        // Display learning, quiz, or sentence translation question
+        function displayQuestion() {
+            if (currentQuestion < questions.length) {
+                const questionData = questions[currentQuestion];
+
+                if (questionData.type === "learn") {
+                    // Learn vocabulary
+                    lessonContainer.innerHTML = `
+                        <h2>Learn this word:</h2>
+                        <p><strong>${questionData.english}</strong> = <strong>${questionData.xonian}</strong></p>
+                        <p>Type the Xonian word below to practice:</p>
+                        <input type="text" id="user-answer" placeholder="Type your answer here">
+                    `;
+                } else if (questionData.type === "sentence") {
+                    // Translate sentences
+                    lessonContainer.innerHTML = `
+                        <h2>Translate this sentence:</h2>
+                        <p><strong>${questionData.english}</strong></p>
+                        <input type="text" id="user-answer" placeholder="Type your answer here">
+                    `;
+                }
+
+                updateProgressBar();
+            } else {
+                showCongratulationsPage();
+            }
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // Handle next question
+        nextQuestionButton.addEventListener("click", () => {
+            const userAnswer = document.getElementById("user-answer").value.trim();
+            const questionData = questions[currentQuestion];
+
+            if (questionData.type === "sentence" || questionData.type === "learn") {
+                const normalizedAnswer = normalizeInput(userAnswer);
+                const normalizedCorrect = normalizeInput(questionData.xonian);
+
+                if (normalizedAnswer === normalizedCorrect) {
+                    alert("Correct!");
+                } else {
+                    alert(`Incorrect! The correct answer is: ${questionData.xonian}`);
+                }
+
+                if (questionData.type === "learn") {
+                    learnedWords.push(questionData.english);
+                    questions.push(...generateSentenceQuestions());
+                }
+            }
+
+            currentQuestion++;
+            displayQuestion();
+        });
+
+        // Show congratulations page
+        function showCongratulationsPage() {
+            lessonContainer.innerHTML = `
+                <h2>Congratulations!</h2>
+                <p>You’ve completed this lesson. Great work!</p>
+                <button id="finish-lesson">OK</button>
+            `;
+            nextQuestionButton.style.display = "none";
+            progressBar.style.width = "100%";
+
+            document.getElementById("finish-lesson").addEventListener("click", () => {
+                window.location.href = "index.html";
+            });
+        }
+
+        // Initialize
+        questions.push(...vocabulary);
+        displayQuestion();
+    </script>
+</body>
+</html>
