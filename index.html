@@ -4,14 +4,20 @@
 <style>
 	lesson {
     	color: #02b103;
+        display: block;
+        position: relative;
     }
     lesson button{
     	border-radius: 100%;
+        position: "relative";
+		left: 50%;
         height: 60px;
         width: 60px;
         color: #ffffff;
         background-color: #02b103;
         border-color: #039e03;
+        display: block;
+        padding: "50px"
     }
     unit {
     	font-size: 30px;
@@ -27,15 +33,38 @@
 <p id="2"></p>
 <script>
     var lessons = document.getElementsByTagName("lesson");
-    for (let x of lessons){
-    	var button = document.createElement("button");
-        button.addEventListener("click", function() {
-  		  window.location.href = "/Multislang/lesson.html?lesson=" + x.dataset.session + "&unit=" + x.dataset.unit; 
-		});
-        button.innerHTML = `<img src="/Multislang/output-onlinepngtools.png" alt="star" height="40px" width="40px">`;
-        x.textContent="";
-		x.appendChild(button);
-    }
+  var top = 135; // Start at 135px vertically
+
+  for (let x of lessons) {
+      // Create a button
+      var button = document.createElement("button");
+
+      // Random horizontal position within -7% to 7%
+      var leftOffset = ((Math.random() * 14) - 7).toFixed(2); // Random between -7% and 7%
+      var left = `calc(50% + ${leftOffset}%)`; // Centered + random offset
+
+      // Style the button
+      button.style.position = "absolute";
+      button.style.top = `${top}px`; // Vertical position
+      button.style.left = left; // Horizontal randomization
+      button.style.width = "60px";
+      button.style.height = "60px";
+
+      // Add click event
+      button.addEventListener("click", function() {
+          window.location.href = `/Multislang/lesson.html?lesson=${x.dataset.session}&unit=${x.dataset.unit}`;
+      });
+
+      // Add an image to the button
+      button.innerHTML = `<img src="file:///C:/Users/Calvin/Downloads/output-onlinepngtools.png" alt="star" style="width: 100%; height: 100%;">`;
+
+      // Clear content and append the button
+      x.textContent = ""; // Clear any existing content
+      x.appendChild(button);
+
+      // Increment vertical spacing
+      top += 65; // 60px button height + 5px gap
+  }
 </script>
 </body>
 </html>
